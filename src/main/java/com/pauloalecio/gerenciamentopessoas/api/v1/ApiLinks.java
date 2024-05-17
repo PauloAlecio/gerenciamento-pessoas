@@ -2,6 +2,7 @@ package com.pauloalecio.gerenciamentopessoas.api.v1;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
+import com.pauloalecio.gerenciamentopessoas.api.v1.controller.EnderecoController;
 import com.pauloalecio.gerenciamentopessoas.api.v1.controller.PessoaController;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.Link;
@@ -25,6 +26,14 @@ public class ApiLinks {
 
   public Link linkToPessoas() {
     return linkToPessoas(IanaLinkRelations.SELF.value());
+  }
+
+  public Link linkToEndereco(String rel) {
+    return linkTo(EnderecoController.class).withRel(rel);
+  }
+
+  public Link linkToEndereco() {
+    return linkToEndereco(IanaLinkRelations.SELF.value());
   }
 
 }
