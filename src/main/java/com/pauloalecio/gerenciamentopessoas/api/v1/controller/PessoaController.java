@@ -2,11 +2,18 @@ package com.pauloalecio.gerenciamentopessoas.api.v1.controller;
 
 
 import com.pauloalecio.gerenciamentopessoas.api.ResourceUriHelper;
+import com.pauloalecio.gerenciamentopessoas.api.v1.assembler.EnderecoInputDisassembler;
+import com.pauloalecio.gerenciamentopessoas.api.v1.assembler.EnderecoModelAssembler;
 import com.pauloalecio.gerenciamentopessoas.api.v1.assembler.PessoaInputDisassembler;
 import com.pauloalecio.gerenciamentopessoas.api.v1.assembler.PessoaModelAssembler;
+import com.pauloalecio.gerenciamentopessoas.api.v1.model.EnderecoModel;
 import com.pauloalecio.gerenciamentopessoas.api.v1.model.PessoaModel;
+import com.pauloalecio.gerenciamentopessoas.api.v1.model.input.EnderecoInput;
+import com.pauloalecio.gerenciamentopessoas.api.v1.model.input.EnderecoInputId;
 import com.pauloalecio.gerenciamentopessoas.api.v1.model.input.PessoaInput;
 import com.pauloalecio.gerenciamentopessoas.api.v1.model.input.PessoaInputId;
+import com.pauloalecio.gerenciamentopessoas.domain.model.Endereco;
+import com.pauloalecio.gerenciamentopessoas.domain.service.EnderecoService;
 import com.pauloalecio.gerenciamentopessoas.domain.service.PessoaService;
 import com.pauloalecio.gerenciamentopessoas.domain.model.Pessoa;
 import jakarta.validation.Valid;
@@ -33,6 +40,15 @@ public class PessoaController {
   private PessoaInputDisassembler pessoInputDisassembler;
 
   @Autowired
+  private EnderecoModelAssembler enderecoModelAssembler;
+
+  @Autowired
+  private EnderecoInputDisassembler enderecoInputDisassembler;
+
+  @Autowired
+  private EnderecoService enderecoService;
+
+  @Autowired
   private PessoaService pessoaService;
 
   @GetMapping
@@ -41,7 +57,7 @@ public class PessoaController {
     return ResponseEntity.ok(pessoModelAssembler.toCollectionModel(pessoas));
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("/{pessoaId}")
   public ResponseEntity<PessoaModel> buscarPessoaPorId(@PathVariable Long id) {
     Pessoa pessoa = pessoaService.buscarPessoaPorId(id);
     return ResponseEntity.ok(pessoModelAssembler.toModel(pessoa));
@@ -57,13 +73,45 @@ public class PessoaController {
     return ResponseEntity.status(HttpStatus.CREATED).body(pessoaModel);
   }
 
-  @PutMapping("/{id}")
+  @PutMapping("/{pessoaId}")
   public ResponseEntity<PessoaModel> atualizarPessoa(@PathVariable Long id, @RequestBody @Valid PessoaInputId pessoaInput) {
     Pessoa pessoaAtual = pessoaService.buscarPessoaPorId(id);
     pessoInputDisassembler.copyToDomainObject(pessoaInput,pessoaAtual);
     pessoaAtual = pessoaService.atualizarPessoa(pessoaAtual);
     return ResponseEntity.ok(pessoModelAssembler.toModel(pessoaAtual));
   }
+
+  @PostMapping("/{pessoaId}/endereco")
+  public ResponseEntity<EnderecoModel> adicionarEndereco(@PathVariable Long pessoaId, @RequestBody EnderecoInput enderecoInput) {
+    Endereco endereco = enderecoInputDisassembler.toDomainObject(enderecoInput);
+    endereco = pessoaService.adicionarEndereco(pessoaId, endereco);
+    EnderecoModel enderecoModel = enderecoModelAssembler.toModel(endereco);
+    ResourceUriHelper.addUriInResponseHeader(enderecoModel.getId());
+    return new ResponseEntity<>(enderecoModel, HttpStatus.CREATED);
+  }
+
+  @PutMapping("/{pessoaId}/endereco/{enderecoId}")
+  public ResponseEntity<EnderecoModel> editarEndereco(@PathVariable Long pessoaId,
+      @PathVariable Long enderecoId, @RequestBody EnderecoInputId enderecoInputId) {
+    Endereco enderecoAtual = enderecoService.buscarEnderecoPorId(enderecoId);
+    enderecoInputDisassembler.copyToDomainObject(enderecoInputId,enderecoAtual);
+    enderecoAtual = pessoaService.editarEndereco(pessoaId, enderecoAtual);
+    return ResponseEntity.ok(enderecoModelAssembler.toModel(enderecoAtual));
+  }
+
+  @GetMapping("/{pessoaId}/enderecos")
+  public ResponseEntity<CollectionModel<EnderecoModel>> buscarEnderecos(@PathVariable Long pessoaId) {
+    List<Endereco> enderecos = enderecoService.buscarEndereco(pessoaId);
+    return ResponseEntity.ok(enderecoModelAssembler.toCollectionModel(enderecos));
+  }
+
+  @GetMapping("/{pessoaId}/endereco/{enderecoId}")
+  public ResponseEntity<EnderecoModel> buscarEnderecoPorPessoaId(@PathVariable Long pessoaId,
+      @PathVariable Long enderecoId) {
+    Endereco endereco = enderecoService.buscarEnderecoPorPessoaId(enderecoId,pessoaId);
+    return ResponseEntity.ok(enderecoModelAssembler.toModel(endereco));
+  }
+
 
   @PostMapping("/{pessoaId}/endereco-principal")
   public ResponseEntity<Void> definirEnderecoPrincipal(@PathVariable Long pessoaId, @RequestParam(name = "enderecoId") Long enderecoId) {
@@ -77,7 +125,7 @@ public class PessoaController {
     return ResponseEntity.ok(enderecoPrincipalId);
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/{pessoaId}")
   public ResponseEntity<Void> deletarPessoa(@PathVariable Long id) {
     pessoaService.deletarPessoa(id);
     return ResponseEntity.noContent().build();
