@@ -11,5 +11,9 @@ public class EnderecoNaoEncontradoException extends EntidadeNaoEncontradaExcepti
 	public EnderecoNaoEncontradoException(Long id) {
 		this(String.format("Não existe um cadastro de endereço com id %d", id));
 	}
+
+	public EnderecoNaoEncontradoException() {
+		this("Não encontrado");
+	}
 	
 }
