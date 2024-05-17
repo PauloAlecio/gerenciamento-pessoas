@@ -65,6 +65,18 @@ public class PessoaController {
     return ResponseEntity.ok(pessoModelAssembler.toModel(pessoaAtual));
   }
 
+  @PostMapping("/{pessoaId}/endereco-principal")
+  public ResponseEntity<Void> definirEnderecoPrincipal(@PathVariable Long pessoaId, @RequestParam(name = "enderecoId") Long enderecoId) {
+    pessoaService.definirEnderecoPrincipal(pessoaId, enderecoId);
+    return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("/{pessoaId}/endereco-principal")
+  public ResponseEntity<Long> obterEnderecoPrincipal(@PathVariable Long pessoaId) {
+    Long enderecoPrincipalId = pessoaService.obterEnderecoPrincipal(pessoaId);
+    return ResponseEntity.ok(enderecoPrincipalId);
+  }
+
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deletarPessoa(@PathVariable Long id) {
     pessoaService.deletarPessoa(id);

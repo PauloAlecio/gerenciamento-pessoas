@@ -33,7 +33,7 @@ public class Pessoa {
   private LocalDate dataNascimento;
 
   @Column(nullable = false)
-  private Integer endereco_principal_id;
+  private Long endereco_principal_id;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "pessoa")
   private List<Endereco> enderecos;

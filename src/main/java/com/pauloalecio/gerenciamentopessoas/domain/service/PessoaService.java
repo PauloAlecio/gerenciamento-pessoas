@@ -43,4 +43,16 @@ public class PessoaService {
     }
     pessoaRepository.deleteById(id);
   }
+
+  public void definirEnderecoPrincipal(Long pessoaId, Long enderecoId) {
+    Pessoa pessoa = pessoaRepository.findById(pessoaId).orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
+      pessoa.setEndereco_principal_id(enderecoId);
+      pessoaRepository.save(pessoa);
+  }
+
+  public Long obterEnderecoPrincipal(Long pessoaId) {
+    Pessoa pessoa = pessoaRepository.findById(pessoaId).orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
+      return pessoa.getEndereco_principal_id();
+
+  }
 }
