@@ -1,6 +1,7 @@
 package com.pauloalecio.gerenciamentopessoas.domain.service;
 
 import com.pauloalecio.gerenciamentopessoas.domain.exception.EnderecoNaoEncontradoException;
+import com.pauloalecio.gerenciamentopessoas.domain.exception.PessoaNaoEncontradaException;
 import com.pauloalecio.gerenciamentopessoas.domain.model.Endereco;
 import com.pauloalecio.gerenciamentopessoas.domain.repository.EnderecoRepository;
 import java.util.List;
@@ -22,6 +23,15 @@ public class EnderecoService {
    return enderecoRepository.findById(id).orElseThrow(() -> new EnderecoNaoEncontradoException(id));
   }
 
+  public List<Endereco> buscarEndereco(Long pessoaId) {
+    return enderecoRepository.findByPessoaId(pessoaId).orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
+  }
+
+  public Endereco buscarEnderecoPorPessoaId(Long enderecoId,Long pessoaId) {
+    return enderecoRepository.findByIdAndPessoaId(enderecoId,pessoaId).orElseThrow(EnderecoNaoEncontradoException::new);
+  }
+
+  @Transactional
   public Endereco criarEndereco(Endereco endereco) {
     return enderecoRepository.save(endereco);
   }
@@ -31,6 +41,7 @@ public class EnderecoService {
    return enderecoRepository.save(endereco);
   }
 
+  @Transactional
   public void deletarEndereco(Long id) {
     boolean exists = enderecoRepository.existsById(id);
     if (!exists){
