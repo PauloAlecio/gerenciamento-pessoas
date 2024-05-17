@@ -3,7 +3,6 @@ package com.pauloalecio.gerenciamentopessoas.domain.service;
 import com.pauloalecio.gerenciamentopessoas.domain.exception.EnderecoNaoEncontradoException;
 import com.pauloalecio.gerenciamentopessoas.domain.model.Endereco;
 import com.pauloalecio.gerenciamentopessoas.domain.repository.EnderecoRepository;
-import com.pauloalecio.gerenciamentopessoas.exception.EnderecoException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
