@@ -1,6 +1,8 @@
 package com.pauloalecio.gerenciamentopessoas.domain.service;
 
+import com.pauloalecio.gerenciamentopessoas.domain.exception.EnderecoNaoEncontradoException;
 import com.pauloalecio.gerenciamentopessoas.domain.exception.PessoaNaoEncontradaException;
+import com.pauloalecio.gerenciamentopessoas.domain.model.Endereco;
 import com.pauloalecio.gerenciamentopessoas.domain.model.Pessoa;
 import com.pauloalecio.gerenciamentopessoas.domain.repository.PessoaRepository;
 import java.util.List;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PessoaService {
 
   private final PessoaRepository pessoaRepository;
+  private final EnderecoService enderecoService;
 
   public List<Pessoa> listarPessoas() {
     return pessoaRepository.findAll();
@@ -44,11 +47,34 @@ public class PessoaService {
     pessoaRepository.deleteById(id);
   }
 
-  public void definirEnderecoPrincipal(Long pessoaId, Long enderecoId) {
-    Pessoa pessoa = pessoaRepository.findById(pessoaId).orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
-      pessoa.setEndereco_principal_id(enderecoId);
-      pessoaRepository.save(pessoa);
+  @Transactional
+  public Endereco adicionarEndereco(Long pessoaId, Endereco endereco) {
+        Pessoa pessoa = buscarPessoaPorId(pessoaId);
+        endereco.setPessoa(pessoa);
+        return enderecoService.criarEndereco(endereco);
   }
+
+  @Transactional
+  public Endereco editarEndereco(Long pessoaId, Endereco endereco) {
+    Pessoa pessoa = buscarPessoaPorId(pessoaId);
+    endereco.setPessoa(pessoa);
+    return enderecoService.atualizarEndereco(endereco);
+  }
+
+  public void definirEnderecoPrincipal(Long pessoaId, Long enderecoId) {
+    Pessoa pessoa = pessoaRepository.findById(pessoaId)
+        .orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
+    Endereco endereco = enderecoService.buscarEnderecoPorId(enderecoId);
+
+    if (!endereco.getPessoa().getId().equals(pessoaId)) {
+      throw new EnderecoNaoEncontradoException("Endereço não pertence à pessoa especificada");
+    }
+
+    pessoa.setEndereco_principal_id(enderecoId);
+    pessoaRepository.save(pessoa);
+  }
+
+
 
   public Long obterEnderecoPrincipal(Long pessoaId) {
     Pessoa pessoa = pessoaRepository.findById(pessoaId).orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
