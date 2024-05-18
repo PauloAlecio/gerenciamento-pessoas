@@ -35,7 +35,7 @@ public class Pessoa {
   @Column(nullable = false)
   private Long endereco_principal_id;
 
-  @OneToMany(cascade = CascadeType.ALL, mappedBy = "pessoa")
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "pessoa",orphanRemoval = true)
   private List<Endereco> enderecos;
 
 
