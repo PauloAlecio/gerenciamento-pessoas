@@ -130,4 +130,10 @@ public class PessoaController {
     pessoaService.deletarPessoa(pessoaId);
     return ResponseEntity.noContent().build();
   }
+
+  @DeleteMapping("/{pessoaId}/endereco/{enderecoId}")
+  public ResponseEntity<Void> excluirEndereco(@PathVariable Long pessoaId, @PathVariable Long enderecoId) {
+    pessoaService.excluirEndereco(pessoaId, enderecoId);
+    return ResponseEntity.noContent().build();
+  }
 }
