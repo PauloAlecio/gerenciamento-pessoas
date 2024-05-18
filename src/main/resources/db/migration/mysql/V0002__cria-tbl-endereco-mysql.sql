@@ -5,6 +5,6 @@ CREATE TABLE endereco (
     numero VARCHAR(10) NOT NULL,
     cidade VARCHAR(100) NOT NULL,
     estado VARCHAR(50) NOT NULL,
-    pessoa_id INT,
-    primary key (id)
-) engine=InnoDB default charset=utf8;
+    pessoa_id bigint,
+    PRIMARY KEY (id)
+) engine=InnoDB DEFAULT charset=utf8;

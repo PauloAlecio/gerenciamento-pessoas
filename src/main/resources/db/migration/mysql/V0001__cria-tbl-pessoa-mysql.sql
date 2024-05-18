@@ -1,7 +1,7 @@
 CREATE TABLE pessoa (
     id bigint NOT NULL auto_increment,
-    nome VARCHAR(100),
-    data_nascimento DATE,
-    endereco_principal_id INT,
-    primary key (id)
-) engine=InnoDB default charset=utf8;
+    nome VARCHAR(100) NOT NULL,
+    data_nascimento DATE NOT NULL,
+    endereco_principal_id bigint,
+    PRIMARY KEY (id)
+) engine=InnoDB DEFAULT charset=utf8;
