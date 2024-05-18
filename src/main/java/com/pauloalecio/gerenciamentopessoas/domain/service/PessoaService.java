@@ -6,6 +6,7 @@ import com.pauloalecio.gerenciamentopessoas.domain.model.Endereco;
 import com.pauloalecio.gerenciamentopessoas.domain.model.Pessoa;
 import com.pauloalecio.gerenciamentopessoas.domain.repository.PessoaRepository;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,7 +75,19 @@ public class PessoaService {
     pessoaRepository.save(pessoa);
   }
 
+  public void excluirEndereco(Long pessoaId, Long enderecoId) {
+    Pessoa pessoa = pessoaRepository.findById(pessoaId)
+        .orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
 
+    Endereco endereco = enderecoService.buscarEnderecoPorId(enderecoId);
+
+    if (Objects.equals(pessoa.getEndereco_principal_id(), enderecoId)) {
+      pessoa.setEndereco_principal_id(null);
+      pessoaRepository.save(pessoa);
+    }
+
+    enderecoService.deletarEndereco(endereco.getId());
+  }
 
   public Long obterEnderecoPrincipal(Long pessoaId) {
     Pessoa pessoa = pessoaRepository.findById(pessoaId).orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
