@@ -58,8 +58,8 @@ public class PessoaController {
   }
 
   @GetMapping("/{pessoaId}")
-  public ResponseEntity<PessoaModel> buscarPessoaPorId(@PathVariable Long id) {
-    Pessoa pessoa = pessoaService.buscarPessoaPorId(id);
+  public ResponseEntity<PessoaModel> buscarPessoaPorId(@PathVariable Long pessoaId) {
+    Pessoa pessoa = pessoaService.buscarPessoaPorId(pessoaId);
     return ResponseEntity.ok(pessoModelAssembler.toModel(pessoa));
   }
 
@@ -74,8 +74,8 @@ public class PessoaController {
   }
 
   @PutMapping("/{pessoaId}")
-  public ResponseEntity<PessoaModel> atualizarPessoa(@PathVariable Long id, @RequestBody @Valid PessoaInputId pessoaInput) {
-    Pessoa pessoaAtual = pessoaService.buscarPessoaPorId(id);
+  public ResponseEntity<PessoaModel> atualizarPessoa(@PathVariable Long pessoaId, @RequestBody @Valid PessoaInputId pessoaInput) {
+    Pessoa pessoaAtual = pessoaService.buscarPessoaPorId(pessoaId);
     pessoInputDisassembler.copyToDomainObject(pessoaInput,pessoaAtual);
     pessoaAtual = pessoaService.atualizarPessoa(pessoaAtual);
     return ResponseEntity.ok(pessoModelAssembler.toModel(pessoaAtual));
@@ -126,8 +126,8 @@ public class PessoaController {
   }
 
   @DeleteMapping("/{pessoaId}")
-  public ResponseEntity<Void> deletarPessoa(@PathVariable Long id) {
-    pessoaService.deletarPessoa(id);
+  public ResponseEntity<Void> deletarPessoa(@PathVariable Long pessoaId) {
+    pessoaService.deletarPessoa(pessoaId);
     return ResponseEntity.noContent().build();
   }
 }
