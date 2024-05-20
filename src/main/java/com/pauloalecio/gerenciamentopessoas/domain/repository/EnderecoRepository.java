@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EnderecoRepository extends JpaRepository<Endereco, Long> {
-  Optional<List<Endereco>> findByPessoaId(Long pessoaId );
+  List<Endereco> findByPessoaId(Long pessoaId );
   Optional<Endereco> findByIdAndPessoaId(Long enderecoId,Long pessoaId );
 }
