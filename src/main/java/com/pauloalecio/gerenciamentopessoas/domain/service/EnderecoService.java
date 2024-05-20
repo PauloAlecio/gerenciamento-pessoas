@@ -24,7 +24,7 @@ public class EnderecoService {
   }
 
   public List<Endereco> buscarEndereco(Long pessoaId) {
-    return enderecoRepository.findByPessoaId(pessoaId).orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
+    return enderecoRepository.findByPessoaId(pessoaId);
   }
 
   public Endereco buscarEnderecoPorPessoaId(Long enderecoId,Long pessoaId) {
