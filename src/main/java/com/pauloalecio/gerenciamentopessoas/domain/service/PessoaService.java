@@ -62,6 +62,7 @@ public class PessoaService {
     return enderecoService.atualizarEndereco(endereco);
   }
 
+  @Transactional
   public void definirEnderecoPrincipal(Long pessoaId, Long enderecoId) {
     Pessoa pessoa = pessoaRepository.findById(pessoaId)
         .orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
@@ -75,6 +76,7 @@ public class PessoaService {
     pessoaRepository.save(pessoa);
   }
 
+  @Transactional
   public void excluirEndereco(Long pessoaId, Long enderecoId) {
     Pessoa pessoa = pessoaRepository.findById(pessoaId)
         .orElseThrow(() -> new PessoaNaoEncontradaException(pessoaId));
