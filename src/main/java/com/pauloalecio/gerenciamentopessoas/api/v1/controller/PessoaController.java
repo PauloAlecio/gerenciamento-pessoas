@@ -12,6 +12,7 @@ import com.pauloalecio.gerenciamentopessoas.api.v1.model.input.EnderecoInput;
 import com.pauloalecio.gerenciamentopessoas.api.v1.model.input.EnderecoInputId;
 import com.pauloalecio.gerenciamentopessoas.api.v1.model.input.PessoaInput;
 import com.pauloalecio.gerenciamentopessoas.api.v1.model.input.PessoaInputId;
+import com.pauloalecio.gerenciamentopessoas.api.v1.openapi.PessoaControllerOpenApi;
 import com.pauloalecio.gerenciamentopessoas.domain.model.Endereco;
 import com.pauloalecio.gerenciamentopessoas.domain.service.EnderecoService;
 import com.pauloalecio.gerenciamentopessoas.domain.service.PessoaService;
@@ -19,19 +20,16 @@ import com.pauloalecio.gerenciamentopessoas.domain.model.Pessoa;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("api/v1/pessoas")
-public class PessoaController {
+@RequestMapping(path = "api/v1/pessoas",produces = MediaType.APPLICATION_JSON_VALUE)
+public class PessoaController implements PessoaControllerOpenApi {
 
   @Autowired
   private PessoaModelAssembler pessoModelAssembler;
@@ -51,18 +49,22 @@ public class PessoaController {
   @Autowired
   private PessoaService pessoaService;
 
+
+  @Override
   @GetMapping
   public ResponseEntity<CollectionModel<PessoaModel>> listarPessoas() {
     List<Pessoa> pessoas = pessoaService.listarPessoas();
     return ResponseEntity.ok(pessoModelAssembler.toCollectionModel(pessoas));
   }
 
+  @Override
   @GetMapping("/{pessoaId}")
   public ResponseEntity<PessoaModel> buscarPessoaPorId(@PathVariable Long pessoaId) {
     Pessoa pessoa = pessoaService.buscarPessoaPorId(pessoaId);
     return ResponseEntity.ok(pessoModelAssembler.toModel(pessoa));
   }
 
+  @Override
   @PostMapping
   public ResponseEntity<PessoaModel> criarPessoa(@RequestBody @Valid PessoaInput pessoaInput) {
     Pessoa pessoa =  pessoInputDisassembler.toDomainObject(pessoaInput);
@@ -73,6 +75,7 @@ public class PessoaController {
     return ResponseEntity.status(HttpStatus.CREATED).body(pessoaModel);
   }
 
+  @Override
   @PutMapping("/{pessoaId}")
   public ResponseEntity<PessoaModel> atualizarPessoa(@PathVariable Long pessoaId, @RequestBody @Valid PessoaInputId pessoaInput) {
     Pessoa pessoaAtual = pessoaService.buscarPessoaPorId(pessoaId);
@@ -81,6 +84,7 @@ public class PessoaController {
     return ResponseEntity.ok(pessoModelAssembler.toModel(pessoaAtual));
   }
 
+  @Override
   @PostMapping("/{pessoaId}/endereco")
   public ResponseEntity<EnderecoModel> adicionarEndereco(@PathVariable Long pessoaId, @RequestBody EnderecoInput enderecoInput) {
     Endereco endereco = enderecoInputDisassembler.toDomainObject(enderecoInput);
@@ -90,6 +94,7 @@ public class PessoaController {
     return new ResponseEntity<>(enderecoModel, HttpStatus.CREATED);
   }
 
+  @Override
   @PutMapping("/{pessoaId}/endereco/{enderecoId}")
   public ResponseEntity<EnderecoModel> editarEndereco(@PathVariable Long pessoaId,
       @PathVariable Long enderecoId, @RequestBody EnderecoInputId enderecoInputId) {
@@ -99,12 +104,14 @@ public class PessoaController {
     return ResponseEntity.ok(enderecoModelAssembler.toModel(enderecoAtual));
   }
 
+  @Override
   @GetMapping("/{pessoaId}/enderecos")
   public ResponseEntity<CollectionModel<EnderecoModel>> buscarEnderecos(@PathVariable Long pessoaId) {
     List<Endereco> enderecos = enderecoService.buscarEndereco(pessoaId);
     return ResponseEntity.ok(enderecoModelAssembler.toCollectionModel(enderecos));
   }
 
+  @Override
   @GetMapping("/{pessoaId}/endereco/{enderecoId}")
   public ResponseEntity<EnderecoModel> buscarEnderecoPorPessoaId(@PathVariable Long pessoaId,
       @PathVariable Long enderecoId) {
@@ -113,24 +120,28 @@ public class PessoaController {
   }
 
 
+  @Override
   @PostMapping("/{pessoaId}/endereco-principal")
   public ResponseEntity<Void> definirEnderecoPrincipal(@PathVariable Long pessoaId, @RequestParam(name = "enderecoId") Long enderecoId) {
     pessoaService.definirEnderecoPrincipal(pessoaId, enderecoId);
     return ResponseEntity.ok().build();
   }
 
+  @Override
   @GetMapping("/{pessoaId}/endereco-principal")
   public ResponseEntity<Long> obterEnderecoPrincipal(@PathVariable Long pessoaId) {
     Long enderecoPrincipalId = pessoaService.obterEnderecoPrincipal(pessoaId);
     return ResponseEntity.ok(enderecoPrincipalId);
   }
 
+  @Override
   @DeleteMapping("/{pessoaId}")
   public ResponseEntity<Void> deletarPessoa(@PathVariable Long pessoaId) {
     pessoaService.deletarPessoa(pessoaId);
     return ResponseEntity.noContent().build();
   }
 
+  @Override
   @DeleteMapping("/{pessoaId}/endereco/{enderecoId}")
   public ResponseEntity<Void> excluirEndereco(@PathVariable Long pessoaId, @PathVariable Long enderecoId) {
     pessoaService.excluirEndereco(pessoaId, enderecoId);
