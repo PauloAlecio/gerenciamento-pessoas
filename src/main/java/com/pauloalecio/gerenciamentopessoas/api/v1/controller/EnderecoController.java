@@ -6,6 +6,7 @@ import com.pauloalecio.gerenciamentopessoas.api.v1.assembler.EnderecoModelAssemb
 import com.pauloalecio.gerenciamentopessoas.api.v1.model.EnderecoModel;
 import com.pauloalecio.gerenciamentopessoas.api.v1.model.input.EnderecoInput;
 import com.pauloalecio.gerenciamentopessoas.api.v1.model.input.EnderecoInputId;
+import com.pauloalecio.gerenciamentopessoas.api.v1.openapi.EnderecoControllerOpenApi;
 import com.pauloalecio.gerenciamentopessoas.domain.service.EnderecoService;
 import com.pauloalecio.gerenciamentopessoas.domain.model.Endereco;
 import jakarta.validation.Valid;
@@ -14,13 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("api/v1/enderecos")
-public class EnderecoController {
+@RequestMapping(path = "api/v1/enderecos",produces = MediaType.APPLICATION_JSON_VALUE)
+public class EnderecoController implements EnderecoControllerOpenApi {
 
   @Autowired
   private EnderecoModelAssembler enderecoModelAssembler;
@@ -31,18 +33,21 @@ public class EnderecoController {
   @Autowired
   private EnderecoService enderecoService;
 
+  @Override
   @GetMapping
   public ResponseEntity<CollectionModel<EnderecoModel>> listarEnderecos() {
     List<Endereco> enderecos = enderecoService.listarEnderecos();
     return ResponseEntity.ok(enderecoModelAssembler.toCollectionModel(enderecos));
   }
 
+  @Override
   @GetMapping("/{id}")
   public ResponseEntity<EnderecoModel> buscarEnderecoPorId(@PathVariable Long id) {
     Endereco endereco = enderecoService.buscarEnderecoPorId(id);
     return ResponseEntity.ok(enderecoModelAssembler.toModel(endereco));
   }
 
+  @Override
   @PostMapping
   public ResponseEntity<EnderecoModel> criarEndereco(@RequestBody @Valid EnderecoInput enderecoInput) {
     Endereco endereco = enderecoInputDisassembler.toDomainObject(enderecoInput);
@@ -52,6 +57,7 @@ public class EnderecoController {
     return ResponseEntity.status(HttpStatus.CREATED).body(enderecoModel);
   }
 
+  @Override
   @PutMapping("/{id}")
   public ResponseEntity<EnderecoModel> atualizarEndereco(@PathVariable Long id,
       @RequestBody @Valid EnderecoInputId enderecoInputIdt) {
@@ -61,6 +67,7 @@ public class EnderecoController {
     return ResponseEntity.ok(enderecoModelAssembler.toModel(enderecoAtual));
   }
 
+  @Override
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deletarEndereco(@PathVariable Long id) {
     enderecoService.deletarEndereco(id);
